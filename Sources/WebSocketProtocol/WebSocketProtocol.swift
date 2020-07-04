@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 
-public enum WebSocketMessage {
+public enum WebSocketMessage: Equatable {
     case data(Data)
     case string(String)
     case open
