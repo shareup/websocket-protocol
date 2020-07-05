@@ -3,7 +3,7 @@ import Foundation
 /// A code indicating why a WebSocket connection closed.
 ///
 /// Mirrors [URLSessionWebSocketTask](https://developer.apple.com/documentation/foundation/urlsessionwebsockettask/closecode).
-public enum WebSocketCloseCode: Int {
+public enum WebSocketCloseCode: Int, CaseIterable {
     case invalid = 0
     case normalClosure = 1000
     case goingAway = 1001
