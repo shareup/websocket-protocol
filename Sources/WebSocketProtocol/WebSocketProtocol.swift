@@ -1,17 +1,26 @@
 import Combine
 import Foundation
 
-public enum WebSocketMessage: Hashable {
-    case data(Data)
-    case string(String)
-    case open
-}
-
 public protocol WebSocketProtocol: Publisher where Failure == Error, Output == Result<WebSocketMessage, Error> {
+    /// Initializes an instance of `WebSocketProtocol` with the specified `URL`.
     init(url: URL) throws
 
-    func send(_ data: Data, completionHandler: @escaping (Error?) -> Void) throws
-    func send(_ string: String, completionHandler: @escaping (Error?) -> Void) throws
+    /// Connects the socket to the server.
+    func connect()
 
-    func close()
+    /// Sends the WebSocket data message, receiving the result in a completion handler.
+    func send(_ data: Data, completionHandler: @escaping (Error?) -> Void) throws
+
+    /// Sends the WebSocket text message, receiving the result in a completion handler.
+    func send(_ text: String, completionHandler: @escaping (Error?) -> Void) throws
+
+    /// Sends a close frame to the server with the given close code.
+    func close(_ closeCode: WebSocketCloseCode)
+}
+
+extension WebSocketProtocol {
+    /// Calls `WebSocketProtocol.close(closeCode: .goingAway)`.
+    public func close() {
+        self.close(.goingAway)
+    }
 }

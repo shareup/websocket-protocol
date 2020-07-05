@@ -9,9 +9,10 @@ final class WebSocketProtocolTests: XCTestCase {
 
         try assertConformsToWebSocketProtocol(ws)
 
+        XCTAssertEqual("connect()", ws.calledFunctions.removeFirst())
         XCTAssertEqual("send(_:completionHandler:)", ws.calledFunctions.removeFirst())
         XCTAssertEqual("send(_:completionHandler:)", ws.calledFunctions.removeFirst())
-        XCTAssertEqual("close()", ws.calledFunctions.removeFirst())
+        XCTAssertEqual("close(_:)", ws.calledFunctions.removeFirst())
         XCTAssertEqual("receive(subscriber:)", ws.calledFunctions.removeFirst())
     }
 
@@ -22,6 +23,8 @@ final class WebSocketProtocolTests: XCTestCase {
 
 private extension WebSocketProtocolTests {
     func assertConformsToWebSocketProtocol<T: WebSocketProtocol>(_ ws: T) throws {
+        ws.connect()
+
         let dataCompletionEx = self.expectation(description: "Should have called completion")
         try ws.send("test".data(using: .utf8)!, completionHandler: { _ in dataCompletionEx.fulfill() })
 
@@ -49,22 +52,26 @@ private class WS: WebSocketProtocol {
 
     required init(url: URL) throws { self.url = url }
 
+    func connect() {
+        calledFunctions.append(#function)
+    }
+
     func send(_ data: Data, completionHandler: @escaping (Error?) -> Void) throws {
         calledFunctions.append(#function)
         completionHandler(nil)
     }
 
-    func send(_ string: String, completionHandler: @escaping (Error?) -> Void) throws {
+    func send(_ text: String, completionHandler: @escaping (Error?) -> Void) throws {
         calledFunctions.append(#function)
         completionHandler(nil)
     }
 
-    func close() { calledFunctions.append(#function) }
+    func close(_ closeCode: WebSocketCloseCode) { calledFunctions.append(#function) }
 
     func receive<S: Subscriber>(subscriber: S) where WS.Failure == S.Failure, WS.Output == S.Input {
         calledFunctions.append(#function)
         subject.receive(subscriber: subscriber)
-        subject.send(Result.success(WebSocketMessage.string("test")))
+        subject.send(Result.success(WebSocketMessage.text("test")))
         subject.send(completion: .finished)
     }
 }
