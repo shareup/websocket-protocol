@@ -2,6 +2,9 @@ import Combine
 import Foundation
 
 public protocol WebSocketProtocol: Publisher where Failure == Error, Output == Result<WebSocketMessage, Error> {
+    /// The maximum number of bytes to buffer before the receive call fails with an error.
+    var maximumMessageSize: Int { get set }
+
     /// Initializes an instance of `WebSocketProtocol` with the specified `URL`.
     init(url: URL) throws
 

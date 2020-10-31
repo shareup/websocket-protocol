@@ -50,6 +50,8 @@ private class WS: WebSocketProtocol {
 
     private let subject = PassthroughSubject<Result<WebSocketMessage, Swift.Error>, Error>()
 
+    var maximumMessageSize: Int = 1024 * 1024
+
     required init(url: URL) throws { self.url = url }
 
     func connect() {
